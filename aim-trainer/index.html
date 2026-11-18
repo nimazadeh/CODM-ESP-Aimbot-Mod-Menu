@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>باشگاه تمرین Aim — آفلاین</title>
+<style>
+  :root{
+    --bg:#0c0e11; --panel:#14171c; --panel2:#1b1f26; --line:#2a303a;
+    --txt:#e9edf3; --muted:#8b94a3; --accent:#ff8a1f; --accent2:#ffc073;
+    --good:#4ade80; --bad:#f87171;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--txt)}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Tahoma,"Vazirmatn",sans-serif;line-height:1.6}
+  .app{max-width:960px;margin:0 auto;padding:18px 16px 40px}
+  header{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between;margin-bottom:14px}
+  h1{font-size:20px;margin:0;letter-spacing:.2px}
+  h1 span{color:var(--accent)}
+  .sub{font-size:12.5px;color:var(--muted);margin:2px 0 0}
+  .badge{font-size:11.5px;color:var(--good);border:1px solid #235c3a;background:#10241a;border-radius:999px;padding:5px 11px;white-space:nowrap}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .grow{flex:1 1 160px}
+  label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px}
+  select,input[type=range]{width:100%;accent-color:var(--accent)}
+  select{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:9px 10px;font:inherit;font-size:13px}
+  .modes{display:flex;flex-wrap:wrap;gap:8px}
+  .mode{flex:1 1 150px;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:11px;padding:10px 12px;cursor:pointer;text-align:right;font:inherit;transition:.15s}
+  .mode b{display:block;font-size:13.5px}
+  .mode small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+  .mode:hover{border-color:#4a5361}
+  .mode.on{border-color:var(--accent);background:#2a1e12;box-shadow:inset 0 0 0 1px rgba(255,138,31,.25)}
+  .mode.on b{color:var(--accent2)}
+  button.primary{background:var(--accent);color:#14100b;border:0;border-radius:11px;padding:11px 22px;font:inherit;font-weight:800;font-size:14px;cursor:pointer;min-width:150px}
+  button.primary:hover{background:#ffa04a}
+  button.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:10px;padding:9px 14px;font:inherit;font-size:12px;cursor:pointer}
+  button.ghost:hover{color:var(--txt);border-color:#4a5361}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .arena-wrap{position:relative;width:100%;aspect-ratio:16/10;max-height:62vh;background:#090b0e;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  canvas{display:block;width:100%;height:100%;touch-action:none;cursor:none}
+  .hud{position:absolute;top:10px;right:12px;left:12px;display:flex;justify-content:space-between;pointer-events:none;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .hud b{color:var(--txt)}
+  .timebar{position:absolute;top:0;right:0;left:0;height:3px;background:#20252d;pointer-events:none}
+  .timebar i{display:block;height:100%;background:var(--accent);width:100%}
+  .cover{position:absolute;inset:0;background:rgba(9,11,14,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:20px}
+  .cover.hidden{display:none}
+  .cover h2{margin:0;font-size:19px}
+  .cover p{margin:0;color:var(--muted);font-size:13px;max-width:440px}
+  .cover .big{font-size:26px;color:var(--accent2);font-weight:800;font-variant-numeric:tabular-nums}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:10px;text-align:center}
+  .stat small{display:block;color:var(--muted);font-size:11px}
+  .stat b{display:block;font-size:20px;font-variant-numeric:tabular-nums;margin-top:2px}
+  .stat b.good{color:var(--good)} .stat b.bad{color:var(--bad)}
+  h2.sec{font-size:14px;margin:0 0 10px;color:var(--txt)}
+  table{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
+  th,td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+  th{color:var(--muted);font-weight:600;font-size:11px}
+  .bars{display:flex;align-items:flex-end;gap:5px;height:56px;margin-top:12px}
+  .bars i{flex:1;background:linear-gradient(180deg,var(--accent),#7a3c08);border-radius:4px 4px 0 0;min-height:3px;position:relative}
+  .bars i span{position:absolute;top:-16px;right:0;left:0;text-align:center;font-size:9px;color:var(--muted)}
+  .tips{font-size:12.5px;color:var(--muted);margin:0;padding-right:18px}
+  .tips li{margin-bottom:5px}
+  .foot{text-align:center;color:#5f6875;font-size:11px;margin-top:18px}
+  @media (max-width:520px){
+    h1{font-size:17px} .arena-wrap{aspect-ratio:4/5;max-height:58vh}
+    .stat b{font-size:17px} button.primary{width:100%}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div>
+      <h1>باشگاه تمرین <span>Aim</span></h1>
+      <p class="sub">تمرین واقعی نشانهگیری · فلیک، تعویض هدف و ردیابی</p>
+    </div>
+    <div class="badge">● کاملاً آفلاین · بدون هیچ ارتباطی با بازی</div>
+  </header>
+
+  <div class="card">
+    <div class="modes" id="modes">
+      <button class="mode on" data-mode="flick"><b>فلیک (Flick)</b><small>یک هدف، سریع بزن و برو بعدی</small></button>
+      <button class="mode" data-mode="grid"><b>تعویض هدف (Grid)</b><small>چند هدف همزمان، جابجایی سریع</small></button>
+      <button class="mode" data-mode="tracking"><b>ردیابی (Tracking)</b><small>انگشت/موس رو روی هدف متحرک نگه دار</small></button>
+    </div>
+  </div>
+
+  <div class="card row">
+    <div class="grow">
+      <label for="duration">مدت هر ست</label>
+      <select id="duration"><option value="15">۱۵ ثانیه</option><option value="30" selected>۳۰ ثانیه</option><option value="60">۶۰ ثانیه</option></select>
+    </div>
+    <div class="grow">
+      <label for="size">اندازه هدف: <span id="sizeVal">۳۴</span> px</label>
+      <input type="range" id="size" min="18" max="64" value="34">
+    </div>
+    <div class="grow">
+      <label>&nbsp;</label>
+      <div class="row" style="gap:8px">
+        <button class="primary" id="startBtn">شروع تمرین</button>
+        <button class="ghost" id="stopBtn" disabled>پایان</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="arena-wrap">
+    <canvas id="arena"></canvas>
+    <div class="timebar"><i id="timebar"></i></div>
+    <div class="hud"><span>زمان: <b id="hudTime">—</b></span><span>استریک: <b id="hudStreak">۰</b></span></div>
+    <div class="cover" id="cover">
+      <h2 id="coverTitle">آماده‌ای؟</h2>
+      <p id="coverText">روی «شروع تمرین» بزن. تو موبایل با انگشت بزن، تو دسکتاپ با کلیک. فاصله هم Spaceـه.</p>
+      <button class="primary" id="coverBtn">شروع تمرین</button>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="stats">
+      <div class="stat"><small>برخورد</small><b id="sHits">۰</b></div>
+      <div class="stat"><small>خطا</small><b id="sMiss" class="bad">۰</b></div>
+      <div class="stat"><small>دقت</small><b id="sAcc" class="good">—</b></div>
+      <div class="stat"><small>میانگین واکنش</small><b id="sRt">—</b></div>
+      <div class="stat"><small>بهترین استریک</small><b id="sBest">۰</b></div>
+      <div class="stat"><small>امتیاز</small><b id="sScore">۰</b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px">
+      <h2 class="sec" style="margin:0">جلسات اخیر <span style="color:var(--muted);font-weight:400">(ذخیره محلی، فقط روی همین مرورگر)</span></h2>
+      <button class="ghost" id="csvBtn">خروجی CSV</button>
+    </div>
+    <div id="historyWrap"><p style="color:var(--muted);font-size:12.5px;margin:0">هنوز جلسه‌ای ثبت نشده. یه ست بزن تا پیشرفتت اینجا بیاد.</p></div>
+  </div>
+
+  <div class="card">
+    <h2 class="sec">روتین پیشنهادی (۱۰ دقیقه در روز)</h2>
+    <ul class="tips">
+      <li>۲ ست فلیک برای گرم کردن — <b>اول دقت، بعد سرعت</b>؛ اگه دقتت زیر ۸۵٪ رفت، آرومتر بزن.</li>
+      <li>۲ ست Grid برای جابجایی هدف (همون چیزی که تو مولتی بیشتر به درد میخوره).</li>
+      <li>۱ ست Tracking برای کنترل دست و ثبات ردیابی اسپری.</li>
+      <li>امتیاز و میانگین واکنش رو تو جدول بالا مقایسه کن، نه نتیجهٔ یه مسابقه رو.</li>
+    </ul>
+  </div>
+
+  <p class="foot">این ابزار فقط یه تمرین مهارته: هیچ فایل، پروسس، پکت یا حسابی از بازی رو نمیخونه و بهش وصل نمیشه.</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var canvas = document.getElementById('arena');
+  var ctx = canvas.getContext('2d');
+  var W = 0, H = 0, dpr = 1;
+  var KEY = 'aimtrainer.history.v1';
+
+  var S = {
+    mode:'flick', duration:30, size:34, running:false,
+    targets:[], hits:0, misses:0, streak:0, best:0,
+    rtSum:0, rtN:0, score:0, left:30, elapsed:0, onTarget:0,
+    flash:[], pointer:{x:-999,y:-999,active:false,down:false},
+    last:0, raf:0
+  };
+
+  var el = function(id){ return document.getElementById(id); };
+
+  function resize(){
+    var r = canvas.getBoundingClientRect();
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = Math.max(1, r.width); H = Math.max(1, r.height);
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  function randPos(rad){
+    var pad = rad + 14, x = W/2, y = H/2, tries = 0;
+    do {
+      x = pad + Math.random() * Math.max(1, W - 2*pad);
+      y = pad + Math.random() * Math.max(1, H - 2*pad);
+      tries++;
+    } while (tries < 40 && S.targets.some(function(t){
+      return Math.hypot(t.x - x, t.y - y) < (t.r + rad) * 1.7;
+    }));
+    return {x:x, y:y};
+  }
+
+  function makeTarget(){
+    var p = randPos(S.size), t = {x:p.x, y:p.y, r:S.size, born:performance.now(), vx:0, vy:0};
+    if (S.mode === 'tracking'){
+      var sp = 95 + Math.random()*75, a = Math.random()*Math.PI*2;
+      t.vx = Math.cos(a)*sp; t.vy = Math.sin(a)*sp;
+    }
+    return t;
+  }
+
+  function resetTargets(){
+    S.targets = [];
+    var n = (S.mode === 'grid') ? 5 : 1;
+    for (var i=0;i<n;i++) S.targets.push(makeTarget());
+  }
+
+  function relocate(t){
+    var p = randPos(t.r);
+    t.x = p.x; t.y = p.y; t.born = performance.now();
+    if (S.mode === 'tracking'){
+      var sp = 95 + Math.random()*75, a = Math.random()*Math.PI*2;
+      t.vx = Math.cos(a)*sp; t.vy = Math.sin(a)*sp;
+    }
+  }
+
+  function localPoint(e){
+    var r = canvas.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  }
+
+  function onDown(e){
+    if (!S.running) return;
+    e.preventDefault();
+    var p = localPoint(e);
+    S.pointer.x = p.x; S.pointer.y = p.y; S.pointer.active = true; S.pointer.down = true;
+    if (S.mode === 'tracking') return;
+    var now = performance.now(), idx = -1, bestD = Infinity;
+    for (var i=0;i<S.targets.length;i++){
+      var t = S.targets[i], d = Math.hypot(t.x - p.x, t.y - p.y);
+      if (d <= t.r && d < bestD){ bestD = d; idx = i; }
+    }
+    if (idx >= 0){
+      var hit = S.targets[idx];
+      S.hits++; S.streak++; if (S.streak > S.best) S.best = S.streak;
+      var rt = now - hit.born; S.rtSum += rt; S.rtN++;
+      S.score += Math.round(100 + Math.max(0, 600 - rt)*0.25 + S.streak*4);
+      S.flash.push({x:hit.x, y:hit.y, r:hit.r, t:now});
+      relocate(hit);
+    } else {
+      S.misses++; S.streak = 0;
+    }
+  }
+
+  function onMove(e){
+    var p = localPoint(e);
+    S.pointer.x = p.x; S.pointer.y = p.y; S.pointer.active = true;
+  }
+
+  function accuracy(){
+    if (S.mode === 'tracking') return S.elapsed > 0 ? (S.onTarget / S.elapsed) * 100 : 0;
+    var total = S.hits + S.misses;
+    return total > 0 ? (S.hits / total) * 100 : 0;
+  }
+
+  function fmt(n){ return new Intl.NumberFormat('fa-IR').format(Math.round(n)); }
+  function modeName(m){ return m === 'flick' ? 'فلیک' : (m === 'grid' ? 'Grid' : 'ردیابی'); }
+
+  function updateHUD(){
+    el('hudTime').textContent = fmt(Math.ceil(S.left)) + 's';
+    el('hudStreak').textContent = fmt(S.streak);
+    el('timebar').style.width = (100 * S.left / S.duration) + '%';
+    el('sHits').textContent = fmt(S.hits);
+    el('sMiss').textContent = fmt(S.misses);
+    el('sAcc').textContent = (S.hits + S.misses > 0 || S.elapsed > 0.5) ? Math.round(accuracy()) + '٪' : '—';
+    el('sRt').textContent = S.rtN ? fmt(S.rtSum / S.rtN) + ' ms' : '—';
+    el('sBest').textContent = fmt(S.best);
+    el('sScore').textContent = fmt(S.score);
+  }
+
+  function draw(now){
+    ctx.clearRect(0,0,W,H);
+    // subtle grid
+    ctx.strokeStyle = 'rgba(255,255,255,.035)'; ctx.lineWidth = 1;
+    for (var gx=0; gx<W; gx+=40){ ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke(); }
+    for (var gy=0; gy<H; gy+=40){ ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke(); }
+    // targets
+    for (var i=0;i<S.targets.length;i++){
+      var t = S.targets[i];
+      var g = ctx.createRadialGradient(t.x,t.y,2,t.x,t.y,t.r);
+      g.addColorStop(0,'rgba(255,190,110,.30)'); g.addColorStop(1,'rgba(255,138,31,.10)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(t.x,t.y,t.r,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle = '#ff8a1f'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(t.x,t.y,t.r,0,Math.PI*2); ctx.stroke();
+      ctx.fillStyle = '#ffd9a8'; ctx.beginPath(); ctx.arc(t.x,t.y,3.2,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,217,168,.45)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(t.x-t.r*0.45,t.y); ctx.lineTo(t.x+t.r*0.45,t.y);
+      ctx.moveTo(t.x,t.y-t.r*0.45); ctx.lineTo(t.x,t.y+t.r*0.45); ctx.stroke();
+    }
+    // hit flashes
+    S.flash = S.flash.filter(function(f){ return now - f.t < 260; });
+    for (var j=0;j<S.flash.length;j++){
+      var f = S.flash[j], k = (now - f.t)/260;
+      ctx.strokeStyle = 'rgba(74,222,128,' + (1-k) + ')'; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(f.x,f.y,f.r + k*26,0,Math.PI*2); ctx.stroke();
+    }
+    // crosshair
+    if (S.pointer.active && S.pointer.x >= 0 && S.pointer.x <= W && S.pointer.y >= 0 && S.pointer.y <= H){
+      var x = S.pointer.x, y = S.pointer.y;
+      ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(x-11,y); ctx.lineTo(x-4,y); ctx.moveTo(x+4,y); ctx.lineTo(x+11,y);
+      ctx.moveTo(x,y-11); ctx.lineTo(x,y-4); ctx.moveTo(x,y+4); ctx.lineTo(x,y+11);
+      ctx.stroke();
+    }
+  }
+
+  function frame(now){
+    if (!S.running) return;
+    var dt = Math.min((now - S.last)/1000, 0.05); S.last = now;
+    S.elapsed += dt; S.left -= dt;
+    if (S.left <= 0){ S.left = 0; updateHUD(); finish(); return; }
+    if (S.mode === 'tracking'){
+      var t = S.targets[0];
+      t.x += t.vx*dt; t.y += t.vy*dt;
+      if (t.x < t.r+6 || t.x > W-t.r-6){ t.vx *= -1; t.x = Math.max(t.r+6, Math.min(W-t.r-6, t.x)); }
+      if (t.y < t.r+6 || t.y > H-t.r-6){ t.vy *= -1; t.y = Math.max(t.r+6, Math.min(H-t.r-6, t.y)); }
+      if (S.pointer.active && Math.hypot(S.pointer.x-t.x, S.pointer.y-t.y) <= t.r){
+        S.onTarget += dt; S.score += dt*120;
+      }
+    }
+    draw(now); updateHUD();
+    S.raf = requestAnimationFrame(frame);
+  }
+
+  function setControls(enabled){
+    el('startBtn').disabled = !enabled;
+    el('duration').disabled = !enabled;
+    el('size').disabled = !enabled;
+    el('stopBtn').disabled = enabled;
+    Array.prototype.forEach.call(document.querySelectorAll('.mode'), function(b){ b.disabled = !enabled; });
+  }
+
+  function start(){
+    resize();
+    S.running = true; S.hits = 0; S.misses = 0; S.streak = 0; S.best = 0;
+    S.rtSum = 0; S.rtN = 0; S.score = 0; S.left = S.duration; S.elapsed = 0;
+    S.onTarget = 0; S.flash = []; S.pointer.active = false;
+    resetTargets();
+    el('cover').classList.add('hidden');
+    setControls(false);
+    S.last = performance.now();
+    updateHUD();
+    S.raf = requestAnimationFrame(frame);
+  }
+
+  function finish(){
+    S.running = false;
+    cancelAnimationFrame(S.raf);
+    var rec = {
+      date: new Date().toISOString(), mode: S.mode, duration: S.duration,
+      hits: S.hits, misses: S.misses, acc: Math.round(accuracy()),
+      rt: S.rtN ? Math.round(S.rtSum/S.rtN) : 0, best: S.best, score: Math.round(S.score)
+    };
+    save(rec); renderHistory();
+    el('coverTitle').textContent = 'ست تموم شد 💪';
+    el('coverText').innerHTML = 'دقت <b>' + fmt(rec.acc) + '٪</b> · میانگین واکنش <b>' +
+      (rec.rt ? fmt(rec.rt) + ' ms' : '—') + '</b> · امتیاز <b>' + fmt(rec.score) + '</b><br>' +
+      'یه ست دیگه بزن و عدداتو با جدول پایین مقایسه کن.';
+    el('coverBtn').textContent = 'دوباره';
+    el('cover').classList.remove('hidden');
+    setControls(true);
+  }
+
+  function load(){
+    try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch(e){ return []; }
+  }
+  function save(rec){
+    var a = load(); a.unshift(rec);
+    try { localStorage.setItem(KEY, JSON.stringify(a.slice(0,60))); } catch(e){}
+  }
+
+  function renderHistory(){
+    var a = load(), wrap = el('historyWrap');
+    if (!a.length){ wrap.innerHTML = '<p style="color:var(--muted);font-size:12.5px;margin:0">هنوز جلسه‌ای ثبت نشده. یه ست بزن تا پیشرفتت اینجا بیاد.</p>'; return; }
+    var rows = a.slice(0,8).map(function(r){
+      var d = new Date(r.date);
+      return '<tr><td>' + d.toLocaleDateString('fa-IR') + ' ' + d.toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit'}) + '</td>' +
+        '<td>' + modeName(r.mode) + '</td><td>' + fmt(r.hits) + '</td><td>' + fmt(r.misses) + '</td>' +
+        '<td style="color:var(--good)">' + fmt(r.acc) + '٪</td><td>' + (r.rt ? fmt(r.rt)+' ms' : '—') + '</td>' +
+        '<td><b>' + fmt(r.score) + '</b></td></tr>';
+    }).join('');
+    var recent = a.slice(0,12).reverse(), max = Math.max.apply(null, recent.map(function(r){ return r.score; }).concat([1]));
+    var bars = recent.map(function(r){
+      return '<i style="height:' + Math.max(3, Math.round(52*r.score/max)) + 'px" title="' + fmt(r.score) + '"><span>' + fmt(r.acc) + '٪</span></i>';
+    }).join('');
+    wrap.innerHTML = '<table><thead><tr><th>زمان</th><th>حالت</th><th>برخورد</th><th>خطا</th><th>دقت</th><th>واکنش</th><th>امتیاز</th></tr></thead><tbody>' +
+      rows + '</tbody></table><div class="bars">' + bars + '</div>' +
+      '<p style="color:var(--muted);font-size:11px;margin:10px 0 0">نمودار: امتیاز ۱۲ ست آخر (عدد بالای هر ستون = دقت)</p>';
+  }
+
+  function exportCSV(){
+    var a = load();
+    if (!a.length){ alert('هنوز جلسه‌ای ثبت نشده.'); return; }
+    var head = 'date,mode,duration,hits,misses,accuracy,avg_reaction_ms,best_streak,score\n';
+    var body = a.map(function(r){
+      return [r.date,r.mode,r.duration,r.hits,r.misses,r.acc,r.rt,r.best,r.score].join(',');
+    }).join('\n');
+    var blob = new Blob(['\ufeff' + head + body], {type:'text/csv;charset=utf-8'});
+    var url = URL.createObjectURL(blob), a2 = document.createElement('a');
+    a2.href = url; a2.download = 'aim-trainer-history.csv'; a2.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  }
+
+  // wiring
+  Array.prototype.forEach.call(document.querySelectorAll('.mode'), function(b){
+    b.addEventListener('click', function(){
+      if (S.running) return;
+      Array.prototype.forEach.call(document.querySelectorAll('.mode'), function(x){ x.classList.remove('on'); });
+      b.classList.add('on'); S.mode = b.dataset.mode;
+      el('coverTitle').textContent = 'آماده‌ای؟';
+      el('coverText').textContent = (S.mode === 'tracking')
+        ? 'تو این حالت انگشت/موس رو روش نگه دار و هدف متحرک رو دنبال کن؛ دقت = زمانی که روش بودی.'
+        : 'روی «شروع تمرین» بزن. تو موبایل با انگشت بزن، تو دسکتاپ با کلیک. فاصله هم Spaceـه.';
+      el('coverBtn').textContent = 'شروع تمرین';
+    });
+  });
+  el('duration').addEventListener('change', function(){ S.duration = parseInt(this.value,10); S.left = S.duration; updateHUD(); });
+  el('size').addEventListener('input', function(){ S.size = parseInt(this.value,10); el('sizeVal').textContent = fmt(S.size); });
+  el('startBtn').addEventListener('click', start);
+  el('coverBtn').addEventListener('click', start);
+  el('stopBtn').addEventListener('click', function(){ if (S.running) finish(); });
+  el('csvBtn').addEventListener('click', exportCSV);
+  canvas.addEventListener('pointerdown', onDown);
+  canvas.addEventListener('pointermove', onMove);
+  canvas.addEventListener('pointerup', function(){ S.pointer.down = false; });
+  canvas.addEventListener('pointerleave', function(){ S.pointer.active = false; });
+  window.addEventListener('resize', function(){ if (!S.running) resize(); });
+  document.addEventListener('keydown', function(e){
+    if (e.code === 'Space'){ e.preventDefault(); if (!S.running) start(); }
+    if (e.code === 'Escape' && S.running) finish();
+  });
+
+  resize(); updateHUD(); renderHistory();
+  // idle backdrop
+  requestAnimationFrame(function idle(now){
+    if (!S.running){
+      ctx.clearRect(0,0,W,H);
+      ctx.strokeStyle = 'rgba(255,255,255,.035)'; ctx.lineWidth = 1;
+      for (var gx=0; gx<W; gx+=40){ ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke(); }
+      for (var gy=0; gy<H; gy+=40){ ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(W,gy); ctx.stroke(); }
+    }
+    requestAnimationFrame(idle);
+  });
+})();
+</script>
+</body>
+</html>
